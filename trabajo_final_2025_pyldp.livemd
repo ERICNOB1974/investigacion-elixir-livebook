@@ -3,5 +3,19 @@
 ## Section
 
 ```elixir
+defmodule EjemploPasajeParametro do
+  def cambiar(x) do
+    x = x + 1
+    IO.puts("Adentro: #{x}")
+  end
+end
+
+a = 10
+EjemploPasajeParametro.cambiar(a)
+IO.puts("Afuera: #{a}")
+
+```
+
+```elixir
 IO.puts "Hola mundo"
 ```
