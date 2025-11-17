@@ -1,6 +1,14 @@
 # Trabajo Final 2025 - PyLdP
 
-## Section
+## Ejemplo de "Hola mundo!"
+
+```elixir
+IO.puts "Hola mundo!"
+```
+
+## Ejemplo de pasaje de parámetros
+
+Elixir utiliza pasaje por valor. Se trabaja con copias debido a la inmutabilidad de los datos.
 
 ```elixir
 defmodule EjemploPasajeParametro do
@@ -13,9 +21,272 @@ end
 a = 10
 EjemploPasajeParametro.cambiar(a)
 IO.puts("Afuera: #{a}")
-
 ```
 
+## Ejemplo - Lenguaje fuertemente tipado
+
+Operar valores numéricos del mismo tipo sin problemas
+
 ```elixir
-IO.puts "Hola mundo"
+a = 10
+b = 20
+a + b
+```
+
+Elixir detecta todos los errores de tipo. No permite mezclar tipos incompatibles.
+La suma entre entero y string lanza una excepción, que capturamos con try/rescue
+
+```elixir
+try do
+  a + "20"
+rescue
+  e ->
+    IO.puts("Error capturado:")
+    IO.inspect(e)
+end
+```
+
+Concatenar correctamente dos strings
+
+```elixir
+"Hola " <> "mundo!"
+```
+
+## Tipos de datos soportados
+
+La división con / siempre devuelve un float, incluso si ambos operandos son enteros
+
+```elixir
+IO.puts("\n--- Integer y float ---")
+
+a = 10
+b = 4
+
+IO.inspect(a, label: "Integer a")
+IO.inspect(b, label: "Integer b")
+
+IO.inspect(a / b, label: "a / b → float")
+IO.puts("Resultado es float?: #{is_float(a / b)}")
+```
+
+True y false de Elixir
+
+```elixir
+IO.puts("\n--- Booleanos ---")
+IO.inspect(true)
+IO.inspect(false)
+```
+
+Los operadores and y or utilizan cortocircuito. El segundo operando se evalúa solo si es necesario
+
+```elixir
+IO.puts("\n--- Corto circuito ---")
+
+try do
+  result = false and raise("Esto no se evalua")
+  IO.inspect(result, label: "false and ...")
+rescue
+  e -> IO.inspect(e, label: "Error inesperado")
+end
+
+try do
+  result = true or raise("Esto no se evalua")
+  IO.inspect(result, label: "true or ...")
+rescue
+  e -> IO.inspect(e, label: "Error inesperado")
+end
+```
+
+La ausencia de valor se representa con nil
+
+```elixir
+IO.puts("\n--- nil ---")
+IO.inspect(nil)
+```
+
+Un átomo es una constante cuyo valor es su propio nombre. Muy utilizado para estados y etiquetas
+
+```elixir
+IO.puts("\n--- Atomos ---")
+IO.inspect(:ok)
+IO.inspect(:error)
+IO.inspect(:mi_valor)
+```
+
+Los strings son binaries internamente
+
+```elixir
+IO.puts("\n--- Strings ---")
+str = "Hola múndo"
+IO.inspect(str)
+IO.inspect(is_binary(str), label: "¿Es binary?")
+IO.inspect(String.length(str), label: "Length")
+IO.inspect(byte_size(str), label: "Cantidad de bytes")
+```
+
+Las listas son inmutables y están implementadas como listas enlazadas
+
+```elixir
+IO.puts("\n--- Listas ---")
+lista = [1, 2, 3]
+IO.inspect(lista, label: "Lista")
+
+IO.puts("Concatenacion:")
+IO.inspect(lista ++ [4], label: "lista ++ [4]")
+
+IO.puts("Substraccion:")
+IO.inspect(lista -- [2], label: "lista -- [2]")
+
+IO.inspect(lista, label: "Lista original inmutable")
+```
+
+Las tuplas almacenan elementos contiguos en memoria y también son inmutables. En este caso, put_elem genera una nueva tupla modificada
+
+```elixir
+IO.puts("\n--- Tuplas ---")
+t = {:ok, "hello"}
+IO.inspect(t, label: "Original")
+
+t2 = put_elem(t, 1, "world")
+IO.inspect(t2, label: "Modificada")
+IO.inspect(t,  label: "Original no cambia")
+```
+
+## Polimorfismo
+
+Polimorfismo usando pattern matching y guardas
+
+```elixir
+defmodule Utility do
+  def type(value) when is_binary(value), do: "string"
+  def type(value) when is_integer(value), do: "integer"
+end
+
+IO.inspect Utility.type("hola")
+IO.inspect Utility.type(123)
+```
+
+Polimorfismo usando protocolos. Los cuales definen un comportamiento genérico que luego se implementa para distintos tipos de datos
+
+```elixir
+defprotocol UtilityP do
+  @spec type(t) :: String.t()
+  def type(value)
+end
+
+defimpl UtilityP, for: BitString do
+  def type(_value), do: "string"
+end
+
+defimpl UtilityP, for: Integer do
+  def type(_value), do: "integer"
+end
+
+IO.inspect Utility.type("hola")
+IO.inspect Utility.type(123)
+```
+
+Ejemplo protocolo size. Este protocolo calcula el tamaño de estructuras de datos cuyo tamaño ya está precalculado internamente
+
+```elixir
+defprotocol Size do
+  @doc "Calcula el tamaño (NO la longitud) de una estructura de datos"
+  def size(data)
+end
+
+defimpl Size, for: BitString do
+  def size(string), do: byte_size(string)
+end
+
+defimpl Size, for: Map do
+  def size(map), do: map_size(map)
+end
+
+defimpl Size, for: Tuple do
+  def size(tuple), do: tuple_size(tuple)
+end
+
+IO.inspect Size.size("foo")
+
+IO.inspect Size.size({:ok, "hola"})
+
+IO.inspect Size.size(%{label: "algo"})
+
+#IO.inspect Size.size([1, 2, 3])
+```
+
+## Excepciones
+
+Se intenta sumar un átomo y un entero, lo cual provoca un ArithmeticError
+
+```elixir
+IO.puts("\n--- Excepción (error) ---")
+try do
+  :hola + 10
+rescue
+  e in ArithmeticError ->
+    IO.puts("Se capturó una excepcion aritmetica:")
+    IO.inspect(e)
+end
+```
+
+Un valor se lanza con throw y se captura con catch
+
+```elixir
+IO.puts("\n--- Throw / catch ---")
+try do
+  Enum.each(1..5, fn x ->
+    if x == 3, do: throw({:encontre, x})
+  end)
+  "Terminé sin encontrar nada"
+catch
+  {:encontre, valor} ->
+    "Se atrapó throw: #{valor}"
+end
+```
+
+Los procesos pueden morir enviando señales exit. Acá se atrapa manualmente un exit usando catch
+
+```elixir
+IO.puts("\n--- Exit ---")
+try do
+  exit("me voy")
+catch
+  :exit, reason ->
+    IO.puts("Se atrapó un exit:")
+    IO.inspect(reason)
+end
+```
+
+Cuando un proceso hijo muere, puede enviar un mensaje antes. Acá vemos cómo recibir ese mensaje
+
+```elixir
+IO.puts("\n--- Exit en procesos ---")
+parent = self()
+
+spawn(fn ->
+  send(parent, {:saludo, "hola"})
+  exit(:falleci)
+end)
+
+receive do
+  msg -> IO.inspect(msg, label: "Mensaje recibido antes del exit")
+after
+  100 -> IO.puts("timeout")
+end
+```
+
+Haya o no excepción, after se ejecuta siempre. Acá se usa para asegurarse de cerrar un archivo
+
+```elixir
+IO.puts("\n--- Cláusula after ---")
+{:ok, file} = File.open("ejemplo.txt", [:write])
+
+try do
+  IO.write(file, "Hola mundo")
+  raise "falló todo"
+after
+  IO.puts("Cerrando archivo…")
+  File.close(file)
+end
 ```
