@@ -65,26 +65,6 @@ IO.inspect(true)
 IO.inspect(false)
 ```
 
-Los operadores and y or utilizan cortocircuito. El segundo operando se evalúa solo si es necesario
-
-```elixir
-IO.puts("\n--- Corto circuito ---")
-
-try do
-  result = false and raise("Esto no se evalua")
-  IO.inspect(result, label: "false and ...")
-rescue
-  e -> IO.inspect(e, label: "Error inesperado")
-end
-
-try do
-  result = true or raise("Esto no se evalua")
-  IO.inspect(result, label: "true or ...")
-rescue
-  e -> IO.inspect(e, label: "Error inesperado")
-end
-```
-
 La ausencia de valor se representa con nil
 
 ```elixir
@@ -146,6 +126,26 @@ El integer se castea internamente a float para ser sumado
 
 ```elixir
 2 + 3.5
+```
+
+Los operadores and y or utilizan cortocircuito. El segundo operando se evalúa solo si es necesario
+
+```elixir
+IO.puts("\n--- Corto circuito ---")
+
+try do
+  result = false and raise("Esto no se evalua")
+  IO.inspect(result, label: "false and ...")
+rescue
+  e -> IO.inspect(e, label: "Error inesperado")
+end
+
+try do
+  result = true or raise("Esto no se evalua")
+  IO.inspect(result, label: "true or ...")
+rescue
+  e -> IO.inspect(e, label: "Error inesperado")
+end
 ```
 
 ## Polimorfismo
