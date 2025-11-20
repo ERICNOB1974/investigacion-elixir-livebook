@@ -140,6 +140,14 @@ IO.inspect(t2, label: "Modificada")
 IO.inspect(t,  label: "Original no cambia")
 ```
 
+## Expresiones
+
+El integer se castea internamente a float para ser sumado
+
+```elixir
+2 + 3.5
+```
+
 ## Polimorfismo
 
 Polimorfismo usando pattern matching y guardas
