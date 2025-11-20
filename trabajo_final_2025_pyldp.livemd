@@ -3,12 +3,7 @@
 ## Ejemplo de "Hola mundo!"
 
 ```elixir
-spawn(fn ->
-  receive do
-    {:hola, from} -> IO.puts("Hola #{inspect from}")
-  end
-end)
-
+IO.puts("Hola mundo!")
 ```
 
 ## Ejemplo - Lenguaje fuertemente tipado
