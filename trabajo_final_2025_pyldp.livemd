@@ -3,24 +3,12 @@
 ## Ejemplo de "Hola mundo!"
 
 ```elixir
-IO.puts "Hola mundo!"
-```
-
-## Ejemplo de pasaje de parámetros
-
-Elixir utiliza pasaje por valor. Se trabaja con copias debido a la inmutabilidad de los datos.
-
-```elixir
-defmodule EjemploPasajeParametro do
-  def cambiar(x) do
-    x = x + 1
-    IO.puts("Adentro: #{x}")
+spawn(fn ->
+  receive do
+    {:hola, from} -> IO.puts("Hola #{inspect from}")
   end
-end
+end)
 
-a = 10
-EjemploPasajeParametro.cambiar(a)
-IO.puts("Afuera: #{a}")
 ```
 
 ## Ejemplo - Lenguaje fuertemente tipado
@@ -213,6 +201,101 @@ IO.inspect Size.size({:ok, "hola"})
 IO.inspect Size.size(%{label: "algo"})
 
 #IO.inspect Size.size([1, 2, 3])
+```
+
+## Estructuras de control
+
+Cláusula case básica. Permite comparar valores con una serie de patrones hasta que se encuentre un patrón que coincida con un valor de entrada
+
+```elixir
+case {1, 2, 3} do
+  {4, 5, 6} ->
+    "This clause won't match"
+  {1, x, 3} ->
+    "This clause will match and bind x to 2 in this clause"
+  _ ->
+    "This clause would match any value"
+end
+```
+
+También es posible agregar condiciones extras a las cláusulas
+
+```elixir
+case {1, 2, 3} do
+  {1, x, 3} when x > 0 ->
+    "Will match"
+  _ ->
+    "Would match, if guard condition were not satisfied"
+end
+```
+
+Cláusula if. En algunas situaciones, se necesita escribir código donde las condiciones vayan más allá de lo que puede expresar la cláusula case
+
+```elixir
+if true do
+  "This works!"
+end
+```
+
+Ejemplo con false. Si la condición de la cláusula if retorna false o nil, el bloque de código entre las palabras reservadas do y end no se ejecutará y retornará nil.
+
+```elixir
+if false do
+  "This will never be seen"
+end
+```
+
+Otro aspecto del if es que soporta bloques else.
+
+```elixir
+if nil do
+  "This won't be seen"
+else
+  "This will"
+end
+```
+
+Cláusula cond. Se utiliza si se necesita verificar diferentes condiciones y encontrar la primera que no se evalúa y dar como resultado nil o false
+
+```elixir
+cond do
+  2 + 2 == 5 ->
+    "This will not be true"
+  2 * 2 == 3 ->
+    "Nor this"
+  1 + 1 == 2 ->
+    "But this will"
+end
+```
+
+Hay que tener en cuenta que si todas las condiciones fallan, se produce un error, por lo que es buena práctica agregar una condición final que sea simplemente true
+
+```elixir
+cond do
+  2 + 2 == 5 ->
+    "This is never true"
+  2 * 2 == 3 ->
+    "Nor this"
+  true ->
+    "This is always true (equivalent to else)"
+end
+```
+
+## Ejemplo de pasaje de parámetros
+
+Elixir utiliza pasaje por valor. Se trabaja con copias debido a la inmutabilidad de los datos.
+
+```elixir
+defmodule EjemploPasajeParametro do
+  def cambiar(x) do
+    x = x + 1
+    IO.puts("Adentro: #{x}")
+  end
+end
+
+a = 10
+EjemploPasajeParametro.cambiar(a)
+IO.puts("Afuera: #{a}")
 ```
 
 ## Excepciones
